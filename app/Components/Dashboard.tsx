@@ -1,19 +1,16 @@
 import Intro from "./Intro";
-import Projects from "./Projects";
+import Projects from "./projects/Projects";
 import Statistics from "./Statistics";
-import {
-  projects,
-  completed,
-  totalAll,
-  getFilteredProjects,
-} from "../data/index";
+import { projects } from "@/app/data/projects";
+import { completed, totalAll, getFilteredProjects } from "@/app/types/index";
+
 export default function Dashboard() {
   const totalProjectValue = totalAll;
   const projectsCompleted = completed;
 
   return (
     <section>
-      <div className="mx-auto max-w-6xl">
+      <div className="dashboard-container">
         <Intro />
 
         <Statistics
@@ -24,10 +21,7 @@ export default function Dashboard() {
           }
           projectsLength={projects.length}
         />
-      </div>
-      <br></br>
-      <div>
-        <Projects />
+        <Projects projectpage="All" />
       </div>
     </section>
   );

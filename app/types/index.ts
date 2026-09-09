@@ -1,51 +1,27 @@
-export type ProjectStatus = "In Progress" | "Completed";
+import { projects } from "@/app/data/projects";
+
+export type ProjectStatus =
+  | "Planning"
+  | "In Progress"
+  | "Completed"
+  | "On Hold";
 
 export type ProjectIcon = "chart" | "portfolio" | "fork";
 
-export type ProjectColor = "blue" | "purple" | "orange";
+export type ProjectColor = "green" | "purple" | "orange";
 
 export interface Project {
+  id: string;
   name: string;
   client: string;
   price: number;
-  status: ProjectStatus;
-  icon: ProjectIcon;
-  color: ProjectColor;
+  status: string;
+  icon: string;
+  color: string;
   progress?: number;
   deadline?: string;
   completed?: string;
 }
-
-export const projects: Project[] = [
-  {
-    name: "Admin Dashboard",
-    client: "Papertrail Studio",
-    price: 800,
-    status: "In Progress",
-    icon: "chart",
-    color: "blue",
-    progress: 65,
-    deadline: "Sep 18, 2024",
-  },
-  {
-    name: "Portfolio",
-    client: "Maya Chen",
-    price: 300,
-    status: "Completed",
-    icon: "portfolio",
-    color: "purple",
-    deadline: "Aug 16, 2024",
-  },
-  {
-    name: "Task Manager",
-    client: "Landing Page",
-    price: 500,
-    status: "Completed",
-    icon: "fork",
-    color: "orange",
-    deadline: "Aug 28, 2024",
-  },
-];
 
 export const projectFilter = ["All", "In Progress", "Completed"] as const;
 

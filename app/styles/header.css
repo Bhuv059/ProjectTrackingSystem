@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+/* =========================
+   Header
+========================= */
+
+.app-header {
+  display: flex;
+  height: 4rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+
+  border-bottom: 1px solid rgb(45 212 191 / 0.2);
+  background: linear-gradient(to right, #073b3a, #075e59, #064e4a);
+
+  box-shadow: 0 0 25px rgb(45 212 191 / 0.25);
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-left {
+  gap: 0.75rem;
+}
+
+.header-right {
+  gap: 0.5rem;
+}
+
+.menu-button {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  color: #ccfbf1;
+  transition: background 0.2s ease;
+}
+
+.menu-button:hover {
+  background: rgb(94 234 212 / 0.1);
+}
+
+.app-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  color: #f0fdfa;
+}
+
+.welcome-text {
+  display: none;
+  font-size: 0.875rem;
+  color: rgb(204 251 241 / 0.7);
+}
+
+.profile-avatar {
+  display: flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(153 246 228 / 0.4);
+  border-radius: 9999px;
+  background: rgb(45 212 191 / 0.2);
+  font-weight: 700;
+  color: #f0fdfa;
+  box-shadow: 0 0 15px rgb(45 212 191 / 0.4);
+}

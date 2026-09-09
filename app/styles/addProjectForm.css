@@ -1,0 +1,188 @@
+@import "tailwindcss";
+/* =========================
+    Add Project Form
+ ========================= */
+
+.add-project-wrapper {
+  margin-top: 2rem;
+  border-radius: 0.5rem;
+  background: #24132f;
+  padding: 1.5rem;
+}
+
+.add-project-page {
+  background: #f9fafb;
+  padding: 1.5rem;
+}
+
+.add-project-container {
+  width: 100%;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  transition: color 0.2s ease;
+}
+
+.back-button:hover {
+  color: #0d9488;
+}
+
+.form-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: white;
+  padding: 2rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+}
+
+.form-header {
+  margin-bottom: 2rem;
+}
+
+.form-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.form-description {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 2px #ccfbf1;
+}
+
+.form-textarea {
+  resize: none;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.form-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.form-icon-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-icon-button:hover {
+  border-color: #5eead4;
+}
+
+.form-icon-button.active {
+  border-color: #14b8a6;
+  background: #f0fdfa;
+}
+
+.form-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #6b7280;
+}
+
+.form-icon-button.active .form-icon {
+  color: #0d9488;
+}
+
+.form-icon-label {
+  font-size: 0.75rem;
+  color: #4b5563;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 1.5rem;
+}
+
+.cancel-button,
+.submit-button {
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.cancel-button {
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+
+.cancel-button:hover {
+  background: #f9fafb;
+}
+
+.submit-button {
+  background: #0d9488;
+  color: white;
+}
+
+.submit-button:hover {
+  background: #0f766e;
+}
+
+@media (min-width: 768px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
