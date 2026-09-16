@@ -5,8 +5,8 @@ import "../../styles/addProjectForm.css";
 import { useState } from "react";
 import { ArrowLeft, Briefcase, BarChart3, GitFork } from "lucide-react";
 import { Project } from "@prisma/client";
-import { ProjectFormData, ProjectStatus } from "@/app/lib/project";
-
+import { ProjectFormData, ProjectStatus, ProjectIcon } from "@/app/lib/project";
+import toast from "react-hot-toast";
 interface ProjectFormProps {
   mode: "add" | "edit";
   project?: Project;
@@ -15,7 +15,7 @@ interface ProjectFormProps {
   onAdd?: (project: ProjectFormData) => void;
   onUpdate?: (project: ProjectFormData) => void;
 }
-
+/* 
 const projectIcons = [
   {
     name: "chart",
@@ -32,7 +32,7 @@ const projectIcons = [
     label: "Git Fork",
     Icon: GitFork,
   },
-];
+]; */
 
 export default function ProjectForm({
   mode,
@@ -53,10 +53,18 @@ export default function ProjectForm({
     project?.progress?.toString() ?? "0"
   );
   const [dueDate, setDueDate] = useState(project?.dueDate ?? "");
-  const [icon, setIcon] = useState(project?.icon ?? "chart");
+  //const [icon, setIcon] = useState(project?.icon ?? "chart");
+  const [icon, setIcon] = useState<ProjectIcon>(
+    (project?.icon as ProjectIcon) ?? ProjectIcon.CHART
+  );
   const [color, setColor] = useState(project?.color ?? "purple");
   const [saving, setSaving] = useState(false);
 
+  const iconMap = {
+    [ProjectIcon.CHART]: BarChart3,
+    [ProjectIcon.PORTFOLIO]: Briefcase,
+    [ProjectIcon.FORK]: GitFork,
+  };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (saving) return;
@@ -81,6 +89,8 @@ export default function ProjectForm({
         await onAdd?.(projectData);
       }
     } finally {
+      if (mode === "edit") toast.success("Project updated successfully!");
+      else toast.success("Project added successfully!");
       setSaving(false);
     }
   };
@@ -242,20 +252,23 @@ export default function ProjectForm({
               <label>Project Icon</label>
 
               <div className="form-icon-grid">
-                {projectIcons.map(({ name, label, Icon }) => (
-                  <button
-                    key={name}
-                    type="button"
-                    onClick={() => setIcon(name)}
-                    className={`form-icon-button ${
-                      icon === name ? "active" : ""
-                    }`}
-                  >
-                    <Icon className="form-icon" />
+                {Object.values(ProjectIcon).map((projectIcon) => {
+                  const IconComponent = iconMap[projectIcon];
+                  return (
+                    <button
+                      key={projectIcon}
+                      type="button"
+                      onClick={() => setIcon(projectIcon)}
+                      className={`form-icon-button ${
+                        icon === projectIcon ? "active" : ""
+                      }`}
+                    >
+                      <IconComponent className="form-icon" />
 
-                    <span className="form-icon-label">{label}</span>
-                  </button>
-                ))}
+                      <span className="form-icon-label">{projectIcon}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

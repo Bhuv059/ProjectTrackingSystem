@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProjectCard from "./ProjectCard";
 import { fetchProjects, Project } from "@/app/lib/project";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface ProjectsProps {
   projectpage: string;
@@ -18,6 +20,12 @@ export default function Projects({ projectpage }: ProjectsProps) {
     async function loadProjects() {
       setLoading(true);
       setError("");
+
+      const projectToast = sessionStorage.getItem("projectToast");
+      if (projectToast === "deleted") {
+        toast.success("Project deleted successfully");
+        sessionStorage.removeItem("projectToast");
+      }
 
       try {
         const data = await fetchProjects(

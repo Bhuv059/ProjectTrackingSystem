@@ -6,6 +6,8 @@ import { Project } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ProjectFormData } from "@/app/lib/project";
+import toast from "react-hot-toast";
+
 export default function UpdateProject() {
   const router = useRouter();
   const params = useParams();
@@ -96,6 +98,7 @@ export default function UpdateProject() {
         console.error("Failed to delete project");
         return;
       }
+      sessionStorage.setItem("projectToast", "deleted");
       router.push("/projects");
       setDeleting(false);
       router.refresh();

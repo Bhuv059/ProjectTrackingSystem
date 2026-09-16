@@ -8,7 +8,13 @@ export enum ProjectStatus {
   COMPLETED = "Completed",
   PENDING = "Pending",
 }
-export type ProjectIcon = "chart" | "portfolio" | "fork";
+
+export enum ProjectIcon {
+  CHART = "chart",
+  PORTFOLIO = "portfolio",
+  FORK = "fork",
+}
+//export type ProjectIcon = "chart" | "portfolio" | "fork";
 
 export interface ProjectFormData {
   name: string;
