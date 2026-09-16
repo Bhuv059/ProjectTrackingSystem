@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
 export default function Intro() {
   const router = useRouter();
 
@@ -12,7 +11,9 @@ export default function Intro() {
   return (
     <section className="intro">
       <div>
-        <h1 className="intro-title">Project Tracker</h1>
+        <div className="app-title-row">
+          <h1 className="intro-title">Project Tracker</h1>
+        </div>
 
         <p className="intro-description">
           Keep track of every project, from first brief to final delivery.

@@ -1,6 +1,6 @@
 "use client";
 import "../styles/header.css";
-
+import Image from "next/image";
 interface HeaderProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
@@ -19,7 +19,13 @@ export default function Header({ sidebarOpen, setSidebarOpen }: HeaderProps) {
         >
           <span className="text-2xl">{sidebarOpen ? "×" : "☰"}</span>
         </button>
-
+        <Image
+          src="/favicon.ico"
+          alt="Project Tracker logo"
+          width={42}
+          height={42}
+          className="app-logo"
+        />
         <h1 className="app-title">ProjectTracker</h1>
       </div>
 

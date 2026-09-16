@@ -47,6 +47,16 @@ textarea::placeholder {
   color: #6b7280;
 }
 
+.app-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-logo {
+  width: 42px;
+  height: 42px;
+}
 /* =========================
    Desktop
 ========================= */
@@ -323,4 +333,8 @@ textarea::placeholder {
   align-items: center;
   width: 100%;
   padding-bottom: 5px;
+}
+.delete-project-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

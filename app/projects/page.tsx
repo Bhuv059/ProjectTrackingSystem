@@ -13,7 +13,7 @@ export default function ProjectsPage() {
     router.push("/projects/new");
   };
   return (
-    <AppLayout currentPage={status === "completed" ? "Completed" : "Projects"}>
+    <AppLayout>
       <div className="projects-container">
         <section>
           <h1 className="text-4xl font-normal tracking-tight text-pink-100">

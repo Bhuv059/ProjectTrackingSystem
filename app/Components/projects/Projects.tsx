@@ -1,36 +1,57 @@
-import ProjectCard from "./ProjectCard";
-import { getFilteredProjects } from "../../types/index";
-import { projects } from "../../data/projects";
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import ProjectCard from "./ProjectCard";
+import { fetchProjects, Project } from "@/app/lib/project";
 
 interface ProjectsProps {
   projectpage: string;
 }
 
 export default function Projects({ projectpage }: ProjectsProps) {
-  const showProjects = getFilteredProjects(
-    projects,
-    projectpage === "Completed" ? "Completed" : "All"
-  );
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
+  useEffect(() => {
+    async function loadProjects() {
+      setLoading(true);
+      setError("");
+
+      try {
+        const data = await fetchProjects(
+          projectpage === "Completed" ? "Completed" : undefined
+        );
+
+        setProjects(data);
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+        setError("Failed to load projects. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProjects();
+  }, [projectpage]);
+
+  if (loading) {
+    return <p className="py-10">Loading projects...</p>;
+  }
+
+  if (error) {
+    return <p className="py-10 text-red-400">{error}</p>;
+  }
   return (
     <section>
-      <div className="grid gap-6 py-10 md:grid-cols-2 lg:grid-cols-3 padding: 1.5rem;">
-        {showProjects.map((project) => (
+      <div className="grid gap-6 py-10 md:grid-cols-2 lg:grid-cols-3">
+        {projects.map((project) => (
           <Link
             key={project.id}
             href={`/projects/edit/${encodeURIComponent(project.id)}`}
             className="block h-full transition hover:scale-[1.01]"
           >
-            <ProjectCard
-              name={project.name}
-              description={project.client}
-              status={project.status}
-              value={project.price}
-              progress={project.progress}
-              dueDate={project.deadline}
-              icon={project.icon}
-            />
+            <ProjectCard project={project} />
           </Link>
         ))}
       </div>

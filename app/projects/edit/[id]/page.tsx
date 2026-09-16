@@ -2,10 +2,10 @@
 
 import AppLayout from "@/app/Components/AppLayout";
 import ProjectForm from "@/app/Components/projects/ProjectForm";
-import { Project } from "@/app/types";
+import { Project } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import { ProjectFormData } from "@/app/lib/project";
 export default function UpdateProject() {
   const router = useRouter();
   const params = useParams();
@@ -14,20 +14,21 @@ export default function UpdateProject() {
 
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const getProject = async () => {
       try {
         const response = await fetch(`/api/projects/${id}`);
 
+        console.log("HTTP status:", response.status);
         if (!response.ok) {
           console.error("Failed to fetch project");
-          return;
+          throw new Error(`API error: ${response.status}`);
         }
 
         const data = await response.json();
-
-        setProject(data);
+        setProject(data.project);
       } catch (error) {
         console.error("Error fetching project:", error);
       } finally {
@@ -38,7 +39,7 @@ export default function UpdateProject() {
     getProject();
   }, [id]);
 
-  const handleUpdateProject = async (updatedProject: Project) => {
+  const handleUpdateProject = async (updatedProject: ProjectFormData) => {
     try {
       const response = await fetch(`/api/projects/${id}`, {
         method: "PUT",
@@ -48,11 +49,11 @@ export default function UpdateProject() {
         body: JSON.stringify(updatedProject),
       });
 
-      console.log("response", response);
+      console.log("HTTP status", response.status);
 
       if (!response.ok) {
         console.error("Failed to update project");
-        return;
+        throw new Error(`API error: ${response.status}`);
       }
 
       router.push("/projects");
@@ -64,7 +65,7 @@ export default function UpdateProject() {
 
   if (loading) {
     return (
-      <AppLayout currentPage="Projects">
+      <AppLayout>
         <section>
           <h1 className="text-4xl font-normal tracking-tight text-pink-100">
             Edit Project
@@ -86,14 +87,17 @@ export default function UpdateProject() {
     if (!confirmed) return;
 
     try {
+      setDeleting(true);
       const response = await fetch(`/api/projects/${id}`, {
         method: "DELETE",
       });
+      console.log("HTTP status:", response.status);
       if (!response.ok) {
         console.error("Failed to delete project");
         return;
       }
       router.push("/projects");
+      setDeleting(false);
       router.refresh();
     } catch (error) {
       console.error("Error deleting project", error);
@@ -102,7 +106,7 @@ export default function UpdateProject() {
 
   if (!project) {
     return (
-      <AppLayout currentPage="Projects">
+      <AppLayout>
         <section>
           <h1 className="text-4xl font-normal tracking-tight text-pink-100">
             Project Not Found
@@ -120,7 +124,7 @@ export default function UpdateProject() {
   }
 
   return (
-    <AppLayout currentPage="Projects">
+    <AppLayout>
       <div className="projects-container">
         <section>
           <h1 className="text-4xl font-normal tracking-tight text-pink-100">
@@ -132,8 +136,11 @@ export default function UpdateProject() {
               type="button"
               className="delete-project-button"
               onClick={handleDeleteProject}
+              disabled={deleting}
             >
-              <span className="text-lg leading-none">×</span>
+              <span className="text-lg leading-none">
+                {deleting ? "..." : "x"}
+              </span>
               <span>Delete project</span>
             </button>
           </div>

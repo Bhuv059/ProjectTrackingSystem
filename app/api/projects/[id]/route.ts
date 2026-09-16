@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { prisma } from "../../../lib/prisma";
 
 export async function GET(
   request: Request,
@@ -9,17 +8,9 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const filePath = path.join(process.cwd(), "app", "data", "projects.ts");
-    const file = await fs.readFile(filePath, "utf8");
+    const project = await prisma.project.findUnique({ where: { id } });
 
-    const projectRegex = new RegExp(
-      `\\{\\s*id:\\s*"${id}"[\\s\\S]*?\\n\\s*\\},`,
-      "m"
-    );
-
-    const match = file.match(projectRegex);
-
-    if (!match) {
+    if (!project) {
       return NextResponse.json(
         {
           success: false,
@@ -29,17 +20,7 @@ export async function GET(
         { status: 404 }
       );
     }
-
-    const projectText = match[0].replace(/,\s*$/, "").trim();
-
-    // Convert the TypeScript object syntax into JSON
-    const jsonText = projectText
-      .replace(/(\w+):/g, '"$1":')
-      .replace(/,\s*}/g, "}");
-
-    const project = JSON.parse(jsonText);
-
-    return NextResponse.json(project);
+    return NextResponse.json({ success: true, project }, { status: 200 });
   } catch (error) {
     console.error("GET project error:", error);
 
@@ -60,20 +41,27 @@ export async function PUT(
   try {
     const { id } = await params;
 
-    const updatedProject = await request.json();
+    const formData = await request.json();
 
-    const filePath = path.join(process.cwd(), "app", "data", "projects.ts");
+    const updatedProject = await prisma.project.update({
+      where: { id },
+      data: {
+        name: formData.name,
+        client: formData.client,
+        description: formData.description,
+        status: formData.status,
+        value: Number(formData.value),
+        progress:
+          formData.progress !== undefined && formData.progress !== null
+            ? Number(formData.progress)
+            : null,
+        dueDate: formData.dueDate ?? null,
+        icon: formData.icon ?? null,
+        color: formData.color ?? null,
+      },
+    });
 
-    const file = await fs.readFile(filePath, "utf8");
-
-    const projectRegex = new RegExp(
-      `\\{\\s*id:\\s*"${id}"[\\s\\S]*?\\n\\s*\\},`,
-      "m"
-    );
-
-    const match = file.match(projectRegex);
-
-    if (!match) {
+    if (!updatedProject) {
       return NextResponse.json(
         {
           success: false,
@@ -83,20 +71,29 @@ export async function PUT(
       );
     }
 
-    const projectString = JSON.stringify(updatedProject, null, 2)
-      .replace(/"([^"]+)":/g, "$1:")
-      .replace(/^/gm, "  ");
-
-    const updatedFile = file.replace(projectRegex, `${projectString},`);
-
-    await fs.writeFile(filePath, updatedFile, "utf8");
-
-    return NextResponse.json({
-      success: true,
-      project: updatedProject,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        project: updatedProject,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("PUT project error:", error);
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Project not found",
+        },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json(
       {
@@ -115,16 +112,21 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    const filePath = path.join(process.cwd(), "app", "data", "projects.ts");
+    await prisma.project.delete({ where: { id } });
 
-    const file = await fs.readFile(filePath, "utf8");
+    return NextResponse.json({
+      success: true,
+      message: "Project deleted successfully",
+    });
+  } catch (error) {
+    console.error("DELETE project error:", error);
 
-    const projectRegex = new RegExp(
-      `\\s*\\{\\s*id:\\s*"${id}"[\\s\\S]*?\\n\\s*\\},`,
-      "m"
-    );
-
-    if (!projectRegex.test(file)) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -133,17 +135,6 @@ export async function DELETE(
         { status: 404 }
       );
     }
-
-    const updatedFile = file.replace(projectRegex, "");
-
-    await fs.writeFile(filePath, updatedFile, "utf8");
-
-    return NextResponse.json({
-      success: true,
-      message: "Project deleted successfully",
-    });
-  } catch (error) {
-    console.error("DELETE project error:", error);
 
     return NextResponse.json(
       {

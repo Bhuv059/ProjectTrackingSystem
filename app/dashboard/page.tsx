@@ -5,7 +5,7 @@ import Dashboard from "@/app/Components/Dashboard";
 
 export default function NewProjectPage() {
   return (
-    <AppLayout currentPage="Projects">
+    <AppLayout>
       <section>
         <Dashboard />
       </section>

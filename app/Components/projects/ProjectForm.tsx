@@ -4,16 +4,16 @@ import "../../styles/addProjectForm.css";
 
 import { useState } from "react";
 import { ArrowLeft, Briefcase, BarChart3, GitFork } from "lucide-react";
-
-import { Project } from "../../types/index";
+import { Project } from "@prisma/client";
+import { ProjectFormData, ProjectStatus } from "@/app/lib/project";
 
 interface ProjectFormProps {
   mode: "add" | "edit";
   project?: Project;
 
   onCancel: () => void;
-  onAdd?: (project: Project) => void;
-  onUpdate?: (project: Project) => void;
+  onAdd?: (project: ProjectFormData) => void;
+  onUpdate?: (project: ProjectFormData) => void;
 }
 
 const projectIcons = [
@@ -43,34 +43,45 @@ export default function ProjectForm({
 }: ProjectFormProps) {
   const [name, setName] = useState(project?.name ?? "");
   const [client, setClient] = useState(project?.client ?? "");
-  const [status, setStatus] = useState(project?.status ?? "In Progress");
-  const [price, setPrice] = useState(project?.price?.toString() ?? "");
+  const [description, setDescription] = useState(project?.description ?? "");
+  //const [status, setStatus] = useState(project?.status ?? "In Progress");
+  const [status, setStatus] = useState<ProjectStatus>(
+    ProjectStatus.IN_PROGRESS
+  );
+  const [value, setValue] = useState(project?.value?.toString() ?? "");
   const [progress, setProgress] = useState(
     project?.progress?.toString() ?? "0"
   );
-  const [dueDate, setDueDate] = useState(project?.deadline ?? "");
+  const [dueDate, setDueDate] = useState(project?.dueDate ?? "");
   const [icon, setIcon] = useState(project?.icon ?? "chart");
   const [color, setColor] = useState(project?.color ?? "purple");
+  const [saving, setSaving] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const updatedProject: Project = {
-      id: project?.id ?? crypto.randomUUID(),
+    if (saving) return;
+    const projectData: ProjectFormData = {
       name,
       client,
-      price: Number(price),
+      description,
+      value: Number(value),
       status,
       icon,
       color,
       progress: status === "Completed" ? 100 : Number(progress),
-      deadline: dueDate,
+      dueDate,
     };
 
-    if (mode === "edit") {
-      onUpdate?.(updatedProject);
-    } else {
-      onAdd?.(updatedProject);
+    try {
+      setSaving(true);
+
+      if (mode === "edit") {
+        await onUpdate?.(projectData);
+      } else {
+        await onAdd?.(projectData);
+      }
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -94,14 +105,10 @@ export default function ProjectForm({
           {/* Header */}
           <div className="form-header">
             <h1 className="form-title">
-              {isEditMode ? "Edit Project" : "Add New Project"}
-            </h1>
-
-            <p className="form-description">
               {isEditMode
-                ? "Update your freelance project details below."
-                : "Enter the details of your new project below."}
-            </p>
+                ? "Update project details below"
+                : "Enter details of  new project below."}
+            </h1>
           </div>
 
           <form onSubmit={handleSubmit} className="project-form">
@@ -135,6 +142,21 @@ export default function ProjectForm({
               />
             </div>
 
+            {/* Description */}
+            <div className="form-field">
+              <label htmlFor="client">Description</label>
+
+              <textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter description..."
+                rows={4}
+                required
+                className="form-input form-textarea"
+              />
+            </div>
+
             {/* Status + Color + Value */}
             <div className="form-grid">
               <div className="form-field">
@@ -143,14 +165,14 @@ export default function ProjectForm({
                 <select
                   id="status"
                   value={status}
-                  onChange={(e) => setStatus(e.target.value)}
+                  onChange={(e) => setStatus(e.target.value as ProjectStatus)}
                   className="form-input"
                 >
-                  <option value="In Progress">In Progress</option>
-
-                  <option value="Completed">Completed</option>
-
-                  <option value="Pending">Pending</option>
+                  {Object.values(ProjectStatus).map((projectStatus) => (
+                    <option key={projectStatus} value={projectStatus}>
+                      {projectStatus}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -169,14 +191,14 @@ export default function ProjectForm({
               </div>
 
               <div className="form-field">
-                <label htmlFor="price">Project Value ($)</label>
+                <label htmlFor="value">Project Value ($)</label>
 
                 <input
-                  id="price"
+                  id="value"
                   type="number"
                   min="0"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
                   placeholder="800"
                   required
                   className="form-input"
@@ -238,18 +260,32 @@ export default function ProjectForm({
             </div>
 
             {/* Actions */}
-            <div className="form-actions">
-              <button
-                type="button"
-                onClick={onCancel}
-                className="cancel-button"
-              >
-                Cancel
-              </button>
+            <div className="project-actions">
+              <div className="form-actions">
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  className="cancel-button"
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
 
-              <button type="submit" className="submit-button">
-                {isEditMode ? "Update Project" : "Add Project"}
-              </button>
+                <button
+                  type="submit"
+                  className="submit-button"
+                  disabled={saving}
+                >
+                  {/* {isEditMode ? "Update Project" : "Add Project"} */}
+                  {saving
+                    ? isEditMode
+                      ? "Updating..."
+                      : "Saving..."
+                    : isEditMode
+                      ? "Update Project"
+                      : "Add Project"}
+                </button>
+              </div>
             </div>
           </form>
         </div>
