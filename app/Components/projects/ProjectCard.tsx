@@ -15,11 +15,10 @@ const iconMap: Record<ProjectIcon, React.ElementType> = {
 };
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const { name, description, client, status, value, progress, dueDate, icon } =
-    project;
+  const { name, description, client, status, value, progress, dueDate, icon } = project;
 
-  const Icon =
-    icon && icon in iconMap ? iconMap[icon as ProjectIcon] : BarChart3;
+  const Icon = icon && icon in iconMap ? iconMap[icon as ProjectIcon] : BarChart3;
+
   return (
     <div className="project-card">
       <div className="project-card-header">
@@ -39,7 +38,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
       <div className="project-value">
         <p className="project-value-label">Project Value</p>
-
         <p className="project-value-amount">${value}</p>
       </div>
 
@@ -48,17 +46,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           <>
             <div className="progress-header">
               <span className="progress-label">Project progress</span>
-
               <span className="progress-percentage">{progress ?? 0}%</span>
             </div>
 
             <div className="progress-track">
-              <div
-                className="progress-bar"
-                style={{
-                  width: `${progress ?? 0}%`,
-                }}
-              />
+              <div className="progress-bar" style={{ width: `${progress ?? 0}%` }} />
             </div>
 
             <p className="project-due-date">Due {dueDate}</p>

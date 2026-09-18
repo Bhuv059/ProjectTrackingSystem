@@ -6,12 +6,10 @@ import { Project } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ProjectFormData } from "@/app/lib/project";
-import toast from "react-hot-toast";
 
 export default function UpdateProject() {
   const router = useRouter();
   const params = useParams();
-
   const id = params.id as string;
 
   const [project, setProject] = useState<Project | null>(null);
@@ -24,8 +22,8 @@ export default function UpdateProject() {
         const response = await fetch(`/api/projects/${id}`);
 
         console.log("HTTP status:", response.status);
+
         if (!response.ok) {
-          console.error("Failed to fetch project");
           throw new Error(`API error: ${response.status}`);
         }
 
@@ -45,16 +43,13 @@ export default function UpdateProject() {
     try {
       const response = await fetch(`/api/projects/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedProject),
       });
 
-      console.log("HTTP status", response.status);
+      console.log("HTTP status:", response.status);
 
       if (!response.ok) {
-        console.error("Failed to update project");
         throw new Error(`API error: ${response.status}`);
       }
 
@@ -65,60 +60,54 @@ export default function UpdateProject() {
     }
   };
 
+  const handleDeleteProject = async () => {
+    if (!project?.id) return;
+
+    const confirmed = window.confirm("Are you sure want to delete this project?");
+
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+
+      const response = await fetch(`/api/projects/${id}`, {
+        method: "DELETE",
+      });
+
+      console.log("HTTP status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      sessionStorage.setItem("projectToast", "deleted");
+      router.push("/projects");
+      router.refresh();
+    } catch (error) {
+      console.error("Error deleting project:", error);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <AppLayout>
         <section>
-          <h1 className="text-4xl font-normal tracking-tight text-pink-100">
-            Edit Project
-          </h1>
-
+          <h1 className="text-4xl font-normal tracking-tight text-pink-100">Edit Project</h1>
           <p className="mt-3 text-gray-400">Loading project...</p>
         </section>
       </AppLayout>
     );
   }
 
-  const handleDeleteProject = async () => {
-    if (!project?.id) return;
-
-    const confirmed = window.confirm(
-      "Are you sure want to delete this project?"
-    );
-
-    if (!confirmed) return;
-
-    try {
-      setDeleting(true);
-      const response = await fetch(`/api/projects/${id}`, {
-        method: "DELETE",
-      });
-      console.log("HTTP status:", response.status);
-      if (!response.ok) {
-        console.error("Failed to delete project");
-        return;
-      }
-      sessionStorage.setItem("projectToast", "deleted");
-      router.push("/projects");
-      setDeleting(false);
-      router.refresh();
-    } catch (error) {
-      console.error("Error deleting project", error);
-    }
-  };
-
   if (!project) {
     return (
       <AppLayout>
         <section>
-          <h1 className="text-4xl font-normal tracking-tight text-pink-100">
-            Project Not Found
-          </h1>
+          <h1 className="text-4xl font-normal tracking-tight text-pink-100">Project Not Found</h1>
 
-          <button
-            onClick={() => router.push("/projects")}
-            className="mt-4 rounded-md bg-teal-700 px-4 py-2 text-white"
-          >
+          <button onClick={() => router.push("/projects")} className="mt-4 rounded-md bg-teal-700 px-4 py-2 text-white">
             Back to Projects
           </button>
         </section>
@@ -130,30 +119,18 @@ export default function UpdateProject() {
     <AppLayout>
       <div className="projects-container">
         <section>
-          <h1 className="text-4xl font-normal tracking-tight text-pink-100">
-            Edit Project
-          </h1>
+          <h1 className="text-4xl font-normal tracking-tight text-pink-100">Edit Project</h1>
+
           <p className="mt-3 text-gray-400">Edit your freelance project.</p>
+
           <div className="project-actions">
-            <button
-              type="button"
-              className="delete-project-button"
-              onClick={handleDeleteProject}
-              disabled={deleting}
-            >
-              <span className="text-lg leading-none">
-                {deleting ? "..." : "x"}
-              </span>
+            <button type="button" className="delete-project-button" onClick={handleDeleteProject} disabled={deleting}>
+              <span className="text-lg leading-none">{deleting ? "..." : "x"}</span>
               <span>Delete project</span>
             </button>
           </div>
 
-          <ProjectForm
-            mode="edit"
-            project={project}
-            onCancel={() => router.push("/projects")}
-            onUpdate={handleUpdateProject}
-          />
+          <ProjectForm mode="edit" project={project} onCancel={() => router.push("/projects")} onUpdate={handleUpdateProject} />
         </section>
       </div>
     </AppLayout>

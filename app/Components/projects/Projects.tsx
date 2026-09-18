@@ -1,10 +1,10 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProjectCard from "./ProjectCard";
-import { fetchProjects, Project } from "@/app/lib/project";
-import { useEffect } from "react";
+import { fetchProjects, Project, ProjectStatus } from "@/app/lib/project";
 import toast from "react-hot-toast";
 
 interface ProjectsProps {
@@ -22,46 +22,33 @@ export default function Projects({ projectpage }: ProjectsProps) {
       setError("");
 
       const projectToast = sessionStorage.getItem("projectToast");
-      if (projectToast === "deleted") {
-        toast.success("Project deleted successfully");
-        sessionStorage.removeItem("projectToast");
-      }
+
+      if (projectToast === "deleted") { toast.success("Project deleted successfully"); sessionStorage.removeItem("projectToast"); }
 
       try {
-        const data = await fetchProjects(
-          projectpage === "Completed" ? "Completed" : undefined
-        );
-
+        const data = await fetchProjects(projectpage === ProjectStatus.COMPLETED ? ProjectStatus.COMPLETED : undefined);
         setProjects(data);
       } catch (error) {
         console.error("Failed to fetch projects:", error);
-        setError("Failed to load projects. Please try again.");
+        setError(error instanceof Error ? error.message : "Failed to load projects. Please try again.");
       } finally {
         setLoading(false);
       }
     }
+
     loadProjects();
   }, [projectpage]);
 
-  if (loading) {
-    return <p className="py-10">Loading projects...</p>;
-  }
+  if (loading) { return <p className="py-10">Loading projects...</p>; }
 
-  if (error) {
-    return <p className="py-10 text-red-400">{error}</p>;
-  }
+  if (error) { return <p className="py-10 text-red-400">{error}</p>; }
+
+  if (projects.length === 0) { return <p className="py-10">No projects found.</p>; }
+
   return (
     <section>
       <div className="grid gap-6 py-10 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
-          <Link
-            key={project.id}
-            href={`/projects/edit/${encodeURIComponent(project.id)}`}
-            className="block h-full transition hover:scale-[1.01]"
-          >
-            <ProjectCard project={project} />
-          </Link>
-        ))}
+        {projects.map((project) => (<Link key={project.id} href={`/projects/edit/${encodeURIComponent(project.id)}`} className="block h-full transition hover:scale-[1.01]"><ProjectCard project={project} /></Link>))}
       </div>
     </section>
   );

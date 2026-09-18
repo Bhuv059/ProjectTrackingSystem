@@ -1,4 +1,5 @@
 "use client";
+
 import "../styles/sidebar.css";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -11,25 +12,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
   const status = searchParams.get("status");
 
   const menuItems = [
-    {
-      name: "Dashboard",
-      icon: "⌂",
-      path: "/",
-    },
-    {
-      name: "Projects",
-      icon: "▣",
-      path: "/projects",
-    },
-    {
-      name: "Completed",
-      icon: "✓",
-      path: "/projects?status=completed",
-    },
+    { name: "Dashboard", icon: "⌂", path: "/" },
+    { name: "Projects", icon: "▣", path: "/projects" },
+    { name: "Completed", icon: "✓", path: "/projects?status=completed" },
   ];
 
   const handleNavigation = (path: string) => {
@@ -38,17 +26,9 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   };
 
   const isActive = (name: string) => {
-    if (name === "Dashboard") {
-      return pathname === "/";
-    }
-
-    if (name === "Projects") {
-      return pathname === "/projects" && status !== "completed";
-    }
-
-    if (name === "Completed") {
-      return pathname === "/projects" && status === "completed";
-    }
+    if (name === "Dashboard") return pathname === "/";
+    if (name === "Projects") return pathname === "/projects" && status !== "completed";
+    if (name === "Completed") return pathname === "/projects" && status === "completed";
 
     return false;
   };
@@ -56,12 +36,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   return (
     <>
       {sidebarOpen && (
-        <button
-          type="button"
-          aria-label="Close navigation menu"
-          onClick={() => setSidebarOpen(false)}
-          className="sidebar-overlay lg:hidden"
-        />
+        <button type="button" aria-label="Close navigation menu" onClick={() => setSidebarOpen(false)} className="sidebar-overlay lg:hidden" />
       )}
 
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
@@ -70,14 +45,8 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             const active = isActive(item.name);
 
             return (
-              <button
-                key={item.name}
-                type="button"
-                onClick={() => handleNavigation(item.path)}
-                className={`sidebar-item ${active ? "active" : ""}`}
-              >
+              <button key={item.name} type="button" onClick={() => handleNavigation(item.path)} className={`sidebar-item ${active ? "active" : ""}`}>
                 <span className="sidebar-icon">{item.icon}</span>
-
                 <span className="sidebar-label">{item.name}</span>
               </button>
             );
