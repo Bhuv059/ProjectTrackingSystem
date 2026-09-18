@@ -2,32 +2,23 @@
 
 import AppLayout from "@/app/Components/AppLayout";
 import ProjectForm from "@/app/Components/projects/ProjectForm";
-import { ProjectFormData } from "@/app/lib/project";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { createProject, ProjectFormData } from "@/app/lib/project";
 
 export default function AddProject() {
   const router = useRouter();
   const [error, setError] = useState("");
 
   const handleAddProject = async (newProject: ProjectFormData) => {
-    const response = await fetch("/api/projects", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newProject),
-    });
+    try {
+      await createProject(newProject);
+      router.push("/projects");
+    } catch (error) {
+      console.error("Failed to add project:", error);
 
-    console.log("response", response);
-    console.log("HTTP status:", response.status);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Failed to add project", errorData);
-      setError(errorData.error || "Failed to save project.");
-      return;
+      setError(error instanceof Error ? error.message : "Failed to save project.");
     }
-
-    router.push("/projects");
   };
 
   return (
@@ -40,7 +31,12 @@ export default function AddProject() {
 
           {error && <p className="error-message">{error}</p>}
 
-          <ProjectForm onCancel={() => router.push("/projects")} onAdd={handleAddProject} onUpdate={() => {}} mode="add" />
+          <ProjectForm
+            onCancel={() => router.push("/projects")}
+            onAdd={handleAddProject}
+            onUpdate={() => {}}
+            mode="add"
+          />
         </section>
       </div>
     </AppLayout>

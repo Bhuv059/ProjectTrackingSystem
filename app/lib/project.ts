@@ -99,3 +99,63 @@ export async function fetchProject(id: string): Promise<Project> {
 
   return data.project;
 }
+
+
+export async function createProject(project: ProjectFormData): Promise<Project> {
+  const response = await fetch("/api/projects", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(project),
+  });
+
+  console.log("HTTP status:", response.status);
+
+  const data = await handleApiResponse<ProjectResponse>(response);
+
+  if (!data.success) {
+    throw new Error(data.error || "Failed to create project.");
+  }
+
+  return data.project;
+}
+
+export async function updateProject(
+  id: string,
+  project: ProjectFormData
+): Promise<Project> {
+  const response = await fetch(`/api/projects/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(project),
+  });
+
+  console.log("HTTP status:", response.status);
+
+  const data = await handleApiResponse<ProjectResponse>(response);
+
+  if (!data.success) {
+    throw new Error(data.error || "Failed to update project.");
+  }
+
+  return data.project;
+}
+
+export async function deleteProject(id: string): Promise<void> {
+  const response = await fetch(`/api/projects/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+
+  console.log("HTTP status:", response.status);
+
+  const data = await handleApiResponse<{ success: boolean; error?: string }>(
+    response
+  );
+
+  if (!data.success) {
+    throw new Error(data.error || "Failed to delete project.");
+  }
+}

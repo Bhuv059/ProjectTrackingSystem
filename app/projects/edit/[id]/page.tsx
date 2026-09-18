@@ -5,7 +5,7 @@ import ProjectForm from "@/app/Components/projects/ProjectForm";
 import { Project } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ProjectFormData } from "@/app/lib/project";
+import { deleteProject, fetchProject, ProjectFormData, updateProject } from "@/app/lib/project";
 
 export default function UpdateProject() {
   const router = useRouter();
@@ -19,16 +19,8 @@ export default function UpdateProject() {
   useEffect(() => {
     const getProject = async () => {
       try {
-        const response = await fetch(`/api/projects/${id}`);
-
-        console.log("HTTP status:", response.status);
-
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setProject(data.project);
+        const data = await fetchProject(id);
+        setProject(data);
       } catch (error) {
         console.error("Error fetching project:", error);
       } finally {
@@ -41,17 +33,7 @@ export default function UpdateProject() {
 
   const handleUpdateProject = async (updatedProject: ProjectFormData) => {
     try {
-      const response = await fetch(`/api/projects/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedProject),
-      });
-
-      console.log("HTTP status:", response.status);
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
+      await updateProject(id, updatedProject);
 
       router.push("/projects");
       router.refresh();
@@ -70,15 +52,7 @@ export default function UpdateProject() {
     try {
       setDeleting(true);
 
-      const response = await fetch(`/api/projects/${id}`, {
-        method: "DELETE",
-      });
-
-      console.log("HTTP status:", response.status);
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
+      await deleteProject(id);
 
       sessionStorage.setItem("projectToast", "deleted");
       router.push("/projects");
@@ -130,7 +104,12 @@ export default function UpdateProject() {
             </button>
           </div>
 
-          <ProjectForm mode="edit" project={project} onCancel={() => router.push("/projects")} onUpdate={handleUpdateProject} />
+          <ProjectForm
+            mode="edit"
+            project={project}
+            onCancel={() => router.push("/projects")}
+            onUpdate={handleUpdateProject}
+          />
         </section>
       </div>
     </AppLayout>

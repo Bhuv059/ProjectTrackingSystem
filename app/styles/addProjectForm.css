@@ -186,3 +186,14 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+.form-input {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.project-form {
+  position: relative;
+  z-index: 10;
+}
